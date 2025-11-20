@@ -10,6 +10,5 @@ module tn.client.space_invaders {
     requires org.kordamp.bootstrapfx.core;
     requires com.almasb.fxgl.all;
 
-    opens tn.client.space_invaders to javafx.fxml;
-    exports tn.client.space_invaders;
+    exports tn.client.space_invaders.main;
 }
