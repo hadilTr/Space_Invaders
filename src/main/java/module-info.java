@@ -1,14 +1,13 @@
 module tn.client.space_invaders {
-    requires javafx.controls;
-    requires javafx.fxml;
-    requires javafx.web;
-
-    requires org.controlsfx.controls;
-    requires com.dlsc.formsfx;
-    requires net.synedra.validatorfx;
-    requires org.kordamp.ikonli.javafx;
-    requires org.kordamp.bootstrapfx.core;
-    requires com.almasb.fxgl.all;
-
+    requires java.desktop;
     exports tn.client.space_invaders.main;
+    exports tn.client.space_invaders.core;
+    exports tn.client.space_invaders.controller;
+    exports tn.client.space_invaders.model;
+    exports tn.client.space_invaders.patterns.state;
+    exports tn.client.space_invaders.patterns.decorator;
+    exports tn.client.space_invaders.patterns.composite;
+    exports tn.client.space_invaders.patterns.factory;
+    exports tn.client.space_invaders.services;
+    exports tn.client.space_invaders.view;
 }
