@@ -1,8 +1,9 @@
 package tn.client.space_invaders.patterns.decorator;
 
+import javafx.scene.paint.Color;
 import tn.client.space_invaders.model.GameComponent;
+import javafx.scene.canvas.GraphicsContext;
 
-import java.awt.*;
 
 public class DoubleGunDecorator extends PlayerDecorator {
 
@@ -11,10 +12,10 @@ public class DoubleGunDecorator extends PlayerDecorator {
     }
 
     @Override
-    public void draw(Graphics g) {
+    public void draw(GraphicsContext g) {
         super.draw(g);
         // Dessiner un deuxième canon
-        g.setColor(Color.RED);
+        g.setFill(Color.RED);
         g.fillRect(getX() + getWidth() / 2 - 5, getY() - 10, 10, 10);
     }
 }

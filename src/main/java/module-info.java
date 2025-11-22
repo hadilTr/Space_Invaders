@@ -1,5 +1,5 @@
 module tn.client.space_invaders {
-    requires java.desktop;
+    requires javafx.graphics;
     exports tn.client.space_invaders.main;
     exports tn.client.space_invaders.core;
     exports tn.client.space_invaders.controller;

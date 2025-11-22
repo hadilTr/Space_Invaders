@@ -1,8 +1,7 @@
 package tn.client.space_invaders.patterns.decorator;
 
 import tn.client.space_invaders.model.GameComponent;
-
-import java.awt.*;
+import javafx.scene.canvas.GraphicsContext;
 
 public abstract class PlayerDecorator implements GameComponent {
 
@@ -18,7 +17,7 @@ public abstract class PlayerDecorator implements GameComponent {
     }
 
     @Override
-    public void draw(Graphics g) {
+    public void draw(GraphicsContext g) {
         decoratedPlayer.draw(g);
     }
 

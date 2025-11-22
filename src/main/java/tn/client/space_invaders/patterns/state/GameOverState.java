@@ -1,6 +1,7 @@
 package tn.client.space_invaders.patterns.state;
 
-import java.awt.*;
+import javafx.scene.canvas.GraphicsContext;
+
 
 public class GameOverState implements GameState {
     @Override
@@ -14,7 +15,7 @@ public class GameOverState implements GameState {
     }
 
     @Override
-    public void draw(Graphics g) {
+    public void draw(GraphicsContext g) {
 
     }
 

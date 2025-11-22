@@ -1,8 +1,10 @@
 package tn.client.space_invaders.patterns.state;
 
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import tn.client.space_invaders.core.Game;
-
-import java.awt.*;
 
 public class MenuState implements GameState {
 
@@ -19,17 +21,19 @@ public class MenuState implements GameState {
 
     @Override
     public void update() {
-        // Logique du menu (ex: gestion des clics sur les boutons)
+        // Logique menu
     }
 
     @Override
-    public void draw(Graphics g) {
-        g.setColor(Color.WHITE);
-        g.setFont(new Font("Arial", Font.BOLD, 50));
-        g.drawString("SPACE INVADERS", 150, 100);
+    public void draw(GraphicsContext gc) {
+        // Titre
+        gc.setFill(Color.WHITE);
+        gc.setFont(Font.font("Arial", FontWeight.BOLD, 50));
+        gc.fillText("SPACE INVADERS", 180, 200);
 
-        g.setFont(new Font("Arial", Font.PLAIN, 30));
-        g.drawString("Press ENTER to Play", 250, 300);
+        // Instruction
+        gc.setFont(Font.font("Arial", FontWeight.NORMAL, 20));
+        gc.fillText("Press ENTER to Play", 300, 350);
     }
 
     @Override

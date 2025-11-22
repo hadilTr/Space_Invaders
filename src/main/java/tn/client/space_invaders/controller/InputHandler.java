@@ -1,34 +1,40 @@
 package tn.client.space_invaders.controller;
 
+import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
 import tn.client.space_invaders.core.Game;
 import tn.client.space_invaders.patterns.state.MenuState;
 import tn.client.space_invaders.patterns.state.PlayingState;
 
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.util.HashSet;
+import java.util.Set;
 
-public class InputHandler implements KeyListener {
+public class InputHandler {
 
     private Game game;
+    private Set<KeyCode> activeKeys = new HashSet<>();
 
     public InputHandler(Game game) {
         this.game = game;
     }
 
-    @Override
-    public void keyTyped(KeyEvent e) {
-    }
+    // On attache les écouteurs à la Scène JavaFX
+    public void attachToScene(Scene scene) {
+        scene.setOnKeyPressed(event -> {
+            activeKeys.add(event.getCode());
 
-    @Override
-    public void keyPressed(KeyEvent e) {
-        if (game.getCurrentState() instanceof MenuState) {
-            if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                game.changeState(new PlayingState(game));
+            // Gestion spéciale pour le Menu (appuyer une fois sur Entrée)
+            if (game.getCurrentState() instanceof MenuState) {
+                if (event.getCode() == KeyCode.ENTER) {
+                    game.changeState(new PlayingState(game));
+                }
             }
-        }
+        });
+
+        scene.setOnKeyReleased(event -> activeKeys.remove(event.getCode()));
     }
 
-    @Override
-    public void keyReleased(KeyEvent e) {
+    public boolean isKeyPressed(KeyCode key) {
+        return activeKeys.contains(key);
     }
 }

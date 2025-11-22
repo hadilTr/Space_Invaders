@@ -1,8 +1,8 @@
 package tn.client.space_invaders.patterns.composite;
 
 import tn.client.space_invaders.model.GameObject;
-
-import java.awt.*;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 
 public class Enemy extends GameObject {
 
@@ -16,8 +16,8 @@ public class Enemy extends GameObject {
     }
 
     @Override
-    public void draw(Graphics g) {
-        g.setColor(Color.RED);
-        g.fillRect(x, y, width, height);
+    public void draw(GraphicsContext gc) {
+        gc.setFill(Color.RED);
+        gc.fillRect(x, y, width, height);
     }
 }
