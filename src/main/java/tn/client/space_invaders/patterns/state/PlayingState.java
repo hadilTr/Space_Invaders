@@ -11,6 +11,7 @@ import tn.client.space_invaders.model.Projectile;
 import tn.client.space_invaders.patterns.composite.EnemyGroup;
 import tn.client.space_invaders.patterns.decorator.Player;
 import tn.client.space_invaders.patterns.factory.EntityFactory;
+import tn.client.space_invaders.view.HUD;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -28,6 +29,7 @@ public class PlayingState implements GameState {
     private long lastEscTime = 0;
     private List<Projectile> projectiles = new ArrayList<>();
     private List<PowerUp> powerUps = new ArrayList<>();
+    private HUD hud = new HUD();
 
     private boolean loadNextLevel = false;
 
@@ -118,8 +120,9 @@ public class PlayingState implements GameState {
                     p.setActive(false);
                     game.addScore(level.scorePerEnemy);
 
-                    // 20% chance to drop power-up
-                    if (Math.random() < 0.9) {
+                    // 30% chance to drop power-up (adjust this value)
+                    // 0.1 = 10%, 0.2 = 20%, 0.3 = 30%, 0.5 = 50%, etc.
+                    if (Math.random() < 0.3) {
                         spawnPowerUp((int)p.getX(), (int)p.getY());
                     }
                 }
@@ -194,9 +197,10 @@ public class PlayingState implements GameState {
             powerUp.draw(gc);
         }
 
-        gc.setFill(Color.WHITE);
-        gc.fillText("Score: " + game.getScore(), 10, 20);
-        gc.fillText("Level: " + (currentLevel + 1), 10, 40);
+        // Draw HUD with all info
+        hud.drawGameHUD(gc, game.getScore(), currentLevel + 1,
+                player.hasShield(), player.hasRapidFire(),
+                player.hasTripleShot(), player.hasSpeedBoost());
     }
 
     @Override

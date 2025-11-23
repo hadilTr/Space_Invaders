@@ -164,4 +164,12 @@ public class Player extends GameObject {
     public boolean hasTripleShot() {
         return hasTripleShot;
     }
+
+    public boolean hasRapidFire() {
+        return hasRapidFire;
+    }
+
+    public boolean hasSpeedBoost() {
+        return hasSpeedBoost;
+    }
 }

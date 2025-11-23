@@ -7,13 +7,13 @@ import tn.client.space_invaders.controller.InputHandler;
 import tn.client.space_invaders.model.Level;
 import tn.client.space_invaders.patterns.state.GameState;
 import tn.client.space_invaders.patterns.state.MenuState;
+import tn.client.space_invaders.view.SpaceBackground;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Game {
 
-    // Constantes accessibles partout
     public static final int WIDTH = 800;
     public static final int HEIGHT = 600;
 
@@ -22,12 +22,12 @@ public class Game {
     private AnimationTimer gameLoop;
     private int score;
     private List<Level> levels;
+    private SpaceBackground spaceBackground;
 
     public Game() {
-        // Initialisation
         this.score = 0;
         this.inputHandler = new InputHandler(this);
-        // On démarre sur le Menu
+        this.spaceBackground = new SpaceBackground();
         this.currentState = new MenuState(this);
         this.currentState.enter();
     }
@@ -36,9 +36,7 @@ public class Game {
         gameLoop = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                // 1. Mise à jour logique
                 update();
-                // 2. Dessin
                 render(gc);
             }
         };
@@ -46,17 +44,19 @@ public class Game {
     }
 
     private void update() {
+        // Update space background
+        spaceBackground.update();
+
         if (currentState != null) {
             currentState.update();
         }
     }
 
     private void render(GraphicsContext gc) {
-        // Effacer l'écran (Fond Noir)
-        gc.setFill(Color.BLACK);
-        gc.fillRect(0, 0, WIDTH, HEIGHT);
+        // Draw animated space background instead of black
+        spaceBackground.draw(gc);
 
-        // Dessiner l'état actuel
+        // Draw current game state on top
         if (currentState != null) {
             currentState.draw(gc);
         }
@@ -72,17 +72,12 @@ public class Game {
 
     public List<Level> initializeLevels() {
         levels = new ArrayList<>();
-        //3 levels
         levels.add(new Level(1, 1, 1, 50, 50, 60, 40, 1, 0.005, 100));
-        levels.add(new Level(2, 2, 1, 45, 40, 55, 35, 2, 0.008, 150));
-        levels.add(new Level(3, 3, 3, 40, 60, 60, 45, 3, 0.01, 200));
-
+        levels.add(new Level(2, 6, 9, 45, 40, 55, 35, 2, 0.008, 150));
+        levels.add(new Level(3, 7, 10, 40, 60, 60, 45, 3, 0.01, 200));
         return levels;
-
     }
 
-
-    // Getters
     public GameState getCurrentState() { return currentState; }
     public InputHandler getInputHandler() { return inputHandler; }
     public int getScore() { return score; }
