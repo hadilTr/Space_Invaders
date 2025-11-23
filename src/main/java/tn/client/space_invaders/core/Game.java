@@ -4,8 +4,12 @@ import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import tn.client.space_invaders.controller.InputHandler;
+import tn.client.space_invaders.model.Level;
 import tn.client.space_invaders.patterns.state.GameState;
 import tn.client.space_invaders.patterns.state.MenuState;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Game {
 
@@ -17,6 +21,7 @@ public class Game {
     private InputHandler inputHandler;
     private AnimationTimer gameLoop;
     private int score;
+    private List<Level> levels;
 
     public Game() {
         // Initialisation
@@ -64,6 +69,18 @@ public class Game {
         this.currentState = newState;
         this.currentState.enter();
     }
+
+    public List<Level> initializeLevels() {
+        levels = new ArrayList<>();
+        //3 levels
+        levels.add(new Level(1, 1, 1, 50, 50, 60, 40, 1, 0.005, 100));
+        levels.add(new Level(2, 2, 1, 45, 40, 55, 35, 2, 0.008, 150));
+        levels.add(new Level(3, 3, 3, 40, 60, 60, 45, 3, 0.01, 200));
+
+        return levels;
+
+    }
+
 
     // Getters
     public GameState getCurrentState() { return currentState; }

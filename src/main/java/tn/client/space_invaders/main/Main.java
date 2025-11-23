@@ -24,16 +24,18 @@ public class Main extends Application {
         // IMPORTANT : On branche le clavier sur la scène
         game.getInputHandler().attachToScene(scene);
 
-        // Lancement
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        game.start(gc);
-
+        // Setup stage BEFORE starting game
         primaryStage.setTitle("Space Invaders - JavaFX");
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
 
-        canvas.requestFocus();
+        // Request focus AFTER showing the stage
+        root.requestFocus();
+
+        // Lancement du jeu en dernier
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        game.start(gc);
     }
 
     public static void main(String[] args) {

@@ -121,4 +121,8 @@ public class EnemyGroup implements GameComponent {
     public int getY() { return 0; }
     public int getWidth() { return 0; }
     public int getHeight() { return 0; }
+
+    public void setSpeed(int speed) {
+        this.speed=speed;
+    }
 }

@@ -1,12 +1,15 @@
 package tn.client.space_invaders.patterns.state;
 
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.KeyCode; // Import KeyCode
+import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
+
 import tn.client.space_invaders.core.Game;
-import tn.client.space_invaders.model.Projectile; // Import Projectile
+import tn.client.space_invaders.model.Level;
+import tn.client.space_invaders.model.PowerUp;
+import tn.client.space_invaders.model.Projectile;
 import tn.client.space_invaders.patterns.composite.EnemyGroup;
-import tn.client.space_invaders.patterns.decorator.Player; // Attention : on doit caster en Player
+import tn.client.space_invaders.patterns.decorator.Player;
 import tn.client.space_invaders.patterns.factory.EntityFactory;
 
 import java.util.ArrayList;
@@ -16,10 +19,17 @@ import java.util.List;
 public class PlayingState implements GameState {
 
     private Game game;
-    private Player player; // On change le type de GameComponent à Player pour accéder à shoot()
+    private Player player;
     private EnemyGroup enemies;
+
+    private int currentLevel = 0;
+    private List<Level> levels;
+
     private long lastEscTime = 0;
     private List<Projectile> projectiles = new ArrayList<>();
+    private List<PowerUp> powerUps = new ArrayList<>();
+
+    private boolean loadNextLevel = false;
 
     public PlayingState(Game game) {
         this.game = game;
@@ -27,18 +37,29 @@ public class PlayingState implements GameState {
 
     @Override
     public void enter() {
+        if (levels == null) {
+            levels = game.initializeLevels();
+        }
+
+        Level level = levels.get(currentLevel);
+
+        enemies = new EnemyGroup();
+        projectiles.clear();
+
         if (player == null) {
-            System.out.println("Starting New Game");
+            System.out.println("Starting Game - Level " + (currentLevel + 1));
             player = (Player) EntityFactory.createPlayer(game, 375, 500, 50, 50);
-            enemies = new EnemyGroup();
-            for (int i = 0; i < 5; i++) {
-                for (int j = 0; j < 8; j++) {
-                    enemies.add(EntityFactory.createEnemy(50 + j * 60, 50 + i * 40, 40, 30));
-                }
-            }
-            projectiles.clear();
         } else {
-            System.out.println("Resuming Game from Pause");
+            System.out.println("Loading Level " + (currentLevel + 1));
+        }
+
+        for (int row = 0; row < level.numRows; row++) {
+            for (int col = 0; col < level.numCols; col++) {
+                enemies.add(EntityFactory.createEnemy(
+                        level.startX + col * level.colSpacing,
+                        level.startY + row * level.rowSpacing,
+                        40, 30));
+            }
         }
 
         lastEscTime = System.currentTimeMillis();
@@ -46,79 +67,114 @@ public class PlayingState implements GameState {
 
     @Override
     public void update() {
+        if (loadNextLevel) {
+            loadNextLevel = false;
+            enter();
+            return;
+        }
 
         if (game.getInputHandler().isKeyPressed(KeyCode.ESCAPE)) {
             long now = System.currentTimeMillis();
             if (now - lastEscTime > 200) {
-                lastEscTime = now; // Mise à jour du temps
+                lastEscTime = now;
                 game.changeState(new PauseState(game, this));
                 return;
             }
         }
 
-
-        // 1. Mouvements
         if (player != null) player.update();
         if (enemies != null) enemies.update();
 
-        // 2. Gestion du TIR (Espace)
+        // Player shooting
         if (game.getInputHandler().isKeyPressed(KeyCode.SPACE)) {
-            Projectile p = player.shoot();
-            if (p != null) {
-                projectiles.add(p);
-                // Optionnel : Jouer un son ici
+            if (player.hasTripleShot()) {
+                Projectile[] triple = player.shootTriple();
+                if (triple != null) {
+                    for (Projectile p : triple) {
+                        projectiles.add(p);
+                    }
+                }
+            } else {
+                Projectile p = player.shoot();
+                if (p != null) projectiles.add(p);
             }
         }
 
-        if (Math.random() < 0.005) {
+        // Enemies shooting
+        Level level = levels.get(currentLevel);
+        if (Math.random() < level.enemyFireRate) {
             Projectile p = enemies.shootRandom();
-            if (p != null) {
-                projectiles.add(p);
-            }
+            if (p != null) projectiles.add(p);
         }
 
-        // --- MISE A JOUR PROJECTILES ---
+        // Update and check projectiles
         Iterator<Projectile> it = projectiles.iterator();
         while (it.hasNext()) {
             Projectile p = it.next();
             p.update();
 
-            if (p.isEnemyShot()) {
-                // CAS 1 : C'est un tir ennemi -> Vérifier collision avec JOUEUR
-                if (checkPlayerCollision(p)) {
-                    p.setActive(false);
-                    // GAME OVER !
-                    System.out.println("PERDU !");
-                    // game.changeState(new GameOverState(game)); // On le fera juste après
-                    game.changeState(new MenuState(game)); // Retour au menu pour l'instant
-                }
-            } else {
-                // CAS 2 : C'est un tir joueur -> Vérifier collision avec ENNEMIS
+            if (!p.isEnemyShot()) {
                 if (enemies.checkCollision(p)) {
                     p.setActive(false);
-                    game.addScore(100);
+                    game.addScore(level.scorePerEnemy);
+
+                    // 20% chance to drop power-up
+                    if (Math.random() < 0.9) {
+                        spawnPowerUp((int)p.getX(), (int)p.getY());
+                    }
+                }
+            } else {
+                if (!player.hasShield() && checkPlayerCollision(p)) {
+                    p.setActive(false);
+                    System.out.println("GAME OVER");
+                    game.changeState(new MenuState(game));
                 }
             }
 
-            if (!p.isActive()) {
-                it.remove();
-            }
+            if (!p.isActive()) it.remove();
         }
 
-        // 4. Condition de victoire (Si plus d'ennemis)
+        // Update power-ups
+        Iterator<PowerUp> powerUpIt = powerUps.iterator();
+        while (powerUpIt.hasNext()) {
+            PowerUp powerUp = powerUpIt.next();
+            powerUp.update();
+
+            if (powerUp.checkCollision(player)) {
+                activatePowerUp(powerUp.getType());
+                powerUp.setActive(false);
+                System.out.println("Power-up collected: " + powerUp.getType());
+            }
+
+            if (!powerUp.isActive()) powerUpIt.remove();
+        }
+
+        // Check if level completed
         if (enemies.isEmpty()) {
-            System.out.println("GAGNÉ !");
-            // Plus tard : game.changeState(new WinState(game));
-            // Pour l'instant, on relance le niveau :
-            enter();
+            currentLevel++;
+
+            if (currentLevel >= levels.size()) {
+                System.out.println("YOU WIN THE GAME!!!");
+                game.changeState(new MenuState(game));
+            } else {
+                System.out.println("LEVEL CLEARED! GOING TO LEVEL " + (currentLevel + 1));
+                loadNextLevel = true;
+            }
         }
     }
 
-    private boolean checkPlayerCollision(Projectile p) {
-        if (player == null) return false;
+    private void spawnPowerUp(int x, int y) {
+        PowerUp.PowerUpType[] types = PowerUp.PowerUpType.values();
+        PowerUp.PowerUpType randomType = types[(int)(Math.random() * types.length)];
+        powerUps.add(new PowerUp(x, y, randomType));
+    }
 
-        // C'est ici que le DECORATOR (Bouclier) interviendra plus tard !
-        // Pour l'instant, on teste juste les rectangles.
+    private void activatePowerUp(PowerUp.PowerUpType type) {
+        int duration = 10000; // 10 seconds
+        player.activatePowerUp(type.name(), duration);
+    }
+
+    private boolean checkPlayerCollision(Projectile p) {
         return p.getX() < player.getX() + player.getWidth() &&
                 p.getX() + p.getWidth() > player.getX() &&
                 p.getY() < player.getY() + player.getHeight() &&
@@ -130,17 +186,19 @@ public class PlayingState implements GameState {
         if (player != null) player.draw(gc);
         if (enemies != null) enemies.draw(gc);
 
-        // Dessiner les projectiles
         for (Projectile p : projectiles) {
             p.draw(gc);
         }
 
-        // Afficher le Score
+        for (PowerUp powerUp : powerUps) {
+            powerUp.draw(gc);
+        }
+
         gc.setFill(Color.WHITE);
         gc.fillText("Score: " + game.getScore(), 10, 20);
+        gc.fillText("Level: " + (currentLevel + 1), 10, 40);
     }
 
     @Override
-    public void exit() {
-    }
+    public void exit() { }
 }

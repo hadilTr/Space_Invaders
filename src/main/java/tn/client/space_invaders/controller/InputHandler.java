@@ -21,17 +21,24 @@ public class InputHandler {
     // On attache les écouteurs à la Scène JavaFX
     public void attachToScene(Scene scene) {
         scene.setOnKeyPressed(event -> {
-            activeKeys.add(event.getCode());
+            KeyCode code = event.getCode();
+            activeKeys.add(code);
 
             // Gestion spéciale pour le Menu (appuyer une fois sur Entrée)
             if (game.getCurrentState() instanceof MenuState) {
-                if (event.getCode() == KeyCode.ENTER) {
+                if (code == KeyCode.ENTER) {
                     game.changeState(new PlayingState(game));
                 }
             }
+
+            // Consume the event to prevent it from propagating
+            event.consume();
         });
 
-        scene.setOnKeyReleased(event -> activeKeys.remove(event.getCode()));
+        scene.setOnKeyReleased(event -> {
+            activeKeys.remove(event.getCode());
+            event.consume();
+        });
     }
 
     public boolean isKeyPressed(KeyCode key) {
