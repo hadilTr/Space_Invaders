@@ -72,9 +72,9 @@ public class Game {
 
     public List<Level> initializeLevels() {
         levels = new ArrayList<>();
-        levels.add(new Level(1, 1, 1, 50, 50, 60, 40, 1, 0.005, 100));
-        levels.add(new Level(2, 6, 9, 45, 40, 55, 35, 2, 0.008, 150));
-        levels.add(new Level(3, 7, 10, 40, 60, 60, 45, 3, 0.01, 200));
+        levels.add(new Level(1, 3, 5, 50, 50, 60, 40, 1, 0.005, 100));
+        levels.add(new Level(2, 5, 6, 45, 40, 55, 35, 2, 0.008, 150));
+        levels.add(new Level(3, 6, 10, 40, 60, 60, 45, 3, 0.01, 200));
         return levels;
     }
 

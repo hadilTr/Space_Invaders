@@ -11,8 +11,9 @@ import tn.client.space_invaders.model.Projectile;
 import tn.client.space_invaders.patterns.composite.EnemyGroup;
 import tn.client.space_invaders.patterns.decorator.Player;
 import tn.client.space_invaders.patterns.factory.EntityFactory;
+import tn.client.space_invaders.services.SoundManager;
 import tn.client.space_invaders.view.HUD;
-
+import tn.client.space_invaders.core.GameConfig;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -39,14 +40,27 @@ public class PlayingState implements GameState {
 
     @Override
     public void enter() {
+        // Chargement initial des niveaux si besoin
         if (levels == null) {
             levels = game.initializeLevels();
         }
 
+        // --- CORRECTION CRUCIALE ---
+        // Si le joueur existe ET qu'il reste des ennemis, c'est qu'on revient de PAUSE.
+        // On ne recharge PAS le niveau.
+        if (player != null && enemies != null && !enemies.isEmpty()) {
+            System.out.println("Resuming Game (Pas de reset)");
+            lastEscTime = System.currentTimeMillis(); // Reset du timer pause
+            return; // ON ARRÊTE ICI
+        }
+        // ---------------------------
+
+        // Si on arrive ici, c'est soit une NOUVELLE PARTIE, soit un NOUVEAU NIVEAU
         Level level = levels.get(currentLevel);
 
         enemies = new EnemyGroup();
         projectiles.clear();
+        powerUps.clear(); // Pensez aussi à vider les powerups
 
         if (player == null) {
             System.out.println("Starting Game - Level " + (currentLevel + 1));
@@ -88,12 +102,13 @@ public class PlayingState implements GameState {
         if (enemies != null) enemies.update();
 
         // Player shooting
-        if (game.getInputHandler().isKeyPressed(KeyCode.SPACE)) {
+        if (game.getInputHandler().isActionActive(GameConfig.Action.SHOOT)) {
             if (player.hasTripleShot()) {
                 Projectile[] triple = player.shootTriple();
                 if (triple != null) {
                     for (Projectile p : triple) {
                         projectiles.add(p);
+                        SoundManager.getInstance().playSFX("shoot");
                     }
                 }
             } else {
@@ -119,7 +134,7 @@ public class PlayingState implements GameState {
                 if (enemies.checkCollision(p)) {
                     p.setActive(false);
                     game.addScore(level.scorePerEnemy);
-
+                    SoundManager.getInstance().playSFX("invaderkilled");
                     // 30% chance to drop power-up (adjust this value)
                     // 0.1 = 10%, 0.2 = 20%, 0.3 = 30%, 0.5 = 50%, etc.
                     if (Math.random() < 0.3) {
@@ -129,8 +144,9 @@ public class PlayingState implements GameState {
             } else {
                 if (!player.hasShield() && checkPlayerCollision(p)) {
                     p.setActive(false);
-                    System.out.println("GAME OVER");
-                    game.changeState(new MenuState(game));
+                    SoundManager.getInstance().playSFX("explosion");
+                    game.changeState(new GameOverState(game, game.getScore()));
+                    return;
                 }
             }
 
@@ -157,8 +173,7 @@ public class PlayingState implements GameState {
             currentLevel++;
 
             if (currentLevel >= levels.size()) {
-                System.out.println("YOU WIN THE GAME!!!");
-                game.changeState(new MenuState(game));
+                game.changeState(new WinState(game, game.getScore()));
             } else {
                 System.out.println("LEVEL CLEARED! GOING TO LEVEL " + (currentLevel + 1));
                 loadNextLevel = true;

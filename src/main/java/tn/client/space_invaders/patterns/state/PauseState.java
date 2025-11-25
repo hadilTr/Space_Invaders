@@ -1,58 +1,105 @@
 package tn.client.space_invaders.patterns.state;
 
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.TextAlignment;
 import tn.client.space_invaders.core.Game;
+import tn.client.space_invaders.core.GameConfig;
+import tn.client.space_invaders.services.SoundManager;
 
 public class PauseState implements GameState {
 
     private Game game;
     private GameState returnState;
+    private String[] options = {"REPRENDRE", "OPTIONS", "QUITTER"};
+    private int currentSelection = 0;
+    private long lastInputTime = 0;
 
-    // Le moment précis où on est entré en pause
-    private long startTime;
-
-    public PauseState(Game game, GameState previousState) {
+    public PauseState(Game game, GameState returnState) {
         this.game = game;
-        this.returnState = previousState;
+        this.returnState = returnState;
+        this.lastInputTime = System.currentTimeMillis(); // Important pour l'anti-rebond initial
     }
 
     @Override
     public void enter() {
-        System.out.println("Game Paused");
-        startTime = System.currentTimeMillis();
+        this.lastInputTime = System.currentTimeMillis();
     }
 
     @Override
     public void update() {
-        if (game.getInputHandler().isKeyPressed(KeyCode.ESCAPE)) {
-            long now = System.currentTimeMillis();
-            if (now - startTime > 200) {
+        long now = System.currentTimeMillis();
+        if (now - lastInputTime < 300) return;
+
+        // ECHAP pour revenir direct
+        if (game.getInputHandler().isActionActive(GameConfig.Action.PAUSE)) {
+            game.changeState(returnState);
+            return;
+        }
+
+        // Navigation Menu
+        if (game.getInputHandler().isActionActive(GameConfig.Action.UP)) {
+            currentSelection--;
+            if (currentSelection < 0) currentSelection = options.length - 1;
+            SoundManager.getInstance().playSFX("select");
+            lastInputTime = now;
+        }
+        if (game.getInputHandler().isActionActive(GameConfig.Action.DOWN)) {
+            currentSelection++;
+            if (currentSelection >= options.length) currentSelection = 0;
+            SoundManager.getInstance().playSFX("select");
+            lastInputTime = now;
+        }
+        if (game.getInputHandler().isActionActive(GameConfig.Action.SELECT)) {
+            lastInputTime = now;
+            SoundManager.getInstance().playSFX("select");
+            executeChoice();
+        }
+    }
+
+    private void executeChoice() {
+        switch (currentSelection) {
+            case 0: // REPRENDRE
                 game.changeState(returnState);
-            }
+                break;
+            case 1: // OPTIONS
+                game.changeState(new OptionsState(game, this)); // On reviendra au menu Pause
+                break;
+            case 2: // QUITTER
+                game.changeState(new MenuState(game)); // Retour au menu principal
+                break;
         }
     }
 
     @Override
     public void draw(GraphicsContext gc) {
+        // 1. Dessiner le jeu derrière
         returnState.draw(gc);
 
-        gc.setFill(Color.rgb(0, 0, 0, 0.5));
+        // 2. Voile noir
+        gc.setFill(Color.rgb(0, 0, 0, 0.7));
         gc.fillRect(0, 0, Game.WIDTH, Game.HEIGHT);
 
+        // 3. Menu
+        gc.setTextAlign(TextAlignment.CENTER);
         gc.setFill(Color.WHITE);
         gc.setFont(Font.font("Arial", FontWeight.BOLD, 50));
-        gc.fillText("PAUSE", 300, 300);
+        gc.fillText("PAUSE", Game.WIDTH / 2, 200);
 
-        gc.setFont(Font.font("Arial", FontWeight.NORMAL, 20));
-        gc.fillText("Press ESC to Resume", 290, 350);
+        gc.setFont(Font.font("Consolas", FontWeight.BOLD, 30));
+        for (int i = 0; i < options.length; i++) {
+            if (i == currentSelection) {
+                gc.setFill(Color.YELLOW);
+                gc.fillText("> " + options[i] + " <", Game.WIDTH / 2, 300 + i * 50);
+            } else {
+                gc.setFill(Color.GRAY);
+                gc.fillText(options[i], Game.WIDTH / 2, 300 + i * 50);
+            }
+        }
     }
 
     @Override
-    public void exit() {
-        System.out.println("Resuming Game");
-    }
+    public void exit() {}
 }

@@ -7,6 +7,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import tn.client.space_invaders.core.Game;
+import tn.client.space_invaders.services.SoundManager;
 
 public class Main extends Application {
 
@@ -23,7 +24,7 @@ public class Main extends Application {
 
         // IMPORTANT : On branche le clavier sur la scène
         game.getInputHandler().attachToScene(scene);
-
+        SoundManager.getInstance().startMusic("/tn/client/space_invaders/sounds/spaceinvaders1.mp3");
         // Setup stage BEFORE starting game
         primaryStage.setTitle("Space Invaders - JavaFX");
         primaryStage.setScene(scene);

@@ -3,8 +3,7 @@ package tn.client.space_invaders.controller;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import tn.client.space_invaders.core.Game;
-import tn.client.space_invaders.patterns.state.MenuState;
-import tn.client.space_invaders.patterns.state.PlayingState;
+import tn.client.space_invaders.core.GameConfig; // Import Config
 
 import java.util.HashSet;
 import java.util.Set;
@@ -13,35 +12,35 @@ public class InputHandler {
 
     private Game game;
     private Set<KeyCode> activeKeys = new HashSet<>();
+    private KeyCode lastKey = null;
 
     public InputHandler(Game game) {
         this.game = game;
     }
 
-    // On attache les écouteurs à la Scène JavaFX
     public void attachToScene(Scene scene) {
         scene.setOnKeyPressed(event -> {
-            KeyCode code = event.getCode();
-            activeKeys.add(code);
-
-            // Gestion spéciale pour le Menu (appuyer une fois sur Entrée)
-            if (game.getCurrentState() instanceof MenuState) {
-                if (code == KeyCode.ENTER) {
-                    game.changeState(new PlayingState(game));
-                }
-            }
-
-            // Consume the event to prevent it from propagating
-            event.consume();
+                    activeKeys.add(event.getCode());
+                    lastKey = event.getCode();
         });
-
-        scene.setOnKeyReleased(event -> {
-            activeKeys.remove(event.getCode());
-            event.consume();
-        });
+        scene.setOnKeyReleased(event -> activeKeys.remove(event.getCode()));
     }
 
+    // Ancienne méthode (on la garde pour compatibilité si besoin)
     public boolean isKeyPressed(KeyCode key) {
         return activeKeys.contains(key);
+    }
+
+    // NOUVELLE MÉTHODE : Vérifie une ACTION (ex: Action.SHOOT)
+    // peu importe quelle touche y est associée dans la Config
+    public boolean isActionActive(GameConfig.Action action) {
+        KeyCode boundKey = GameConfig.getInstance().getKey(action);
+        return activeKeys.contains(boundKey);
+    }
+
+    public KeyCode consumeLastKey() {
+        KeyCode k = lastKey;
+        lastKey = null; // On "consomme" l'événement pour ne pas le lire 2 fois
+        return k;
     }
 }

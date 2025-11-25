@@ -4,6 +4,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import tn.client.space_invaders.core.Game;
+import tn.client.space_invaders.core.GameConfig;
 import tn.client.space_invaders.model.GameObject;
 import tn.client.space_invaders.model.Projectile;
 import tn.client.space_invaders.patterns.factory.EntityFactory;
@@ -44,10 +45,12 @@ public class Player extends GameObject {
         int currentSpeed = hasSpeedBoost ? speed * 2 : speed;
 
         // Movement
-        if (game.getInputHandler().isKeyPressed(KeyCode.LEFT)) {
+        if (game.getInputHandler().isActionActive(GameConfig.Action.LEFT)) {
             x -= currentSpeed;
         }
-        if (game.getInputHandler().isKeyPressed(KeyCode.RIGHT)) {
+
+        // 2. DROITE
+        if (game.getInputHandler().isActionActive(GameConfig.Action.RIGHT)) {
             x += currentSpeed;
         }
 
