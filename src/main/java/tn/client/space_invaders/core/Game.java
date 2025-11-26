@@ -2,7 +2,6 @@ package tn.client.space_invaders.core;
 
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
 import tn.client.space_invaders.controller.InputHandler;
 import tn.client.space_invaders.model.Level;
 import tn.client.space_invaders.patterns.state.GameState;

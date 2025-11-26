@@ -26,25 +26,25 @@ public class HUD {
         gc.setFill(Color.rgb(0, 0, 0, 0.6));
         gc.fillRect(0, 0, Game.WIDTH, 70);
 
-        // Draw score with glow effect
+        // Draw score with glow effect - INCREASED margin from 20 to 40
         gc.setFont(regularFont);
-        drawTextWithGlow(gc, "SCORE", 20, 25, Color.CYAN);
+        drawTextWithGlow(gc, "SCORE", 50, 25, Color.CYAN);
         gc.setFont(titleFont);
-        drawTextWithGlow(gc, String.format("%06d", score), 20, 55, Color.WHITE);
+        drawTextWithGlow(gc, String.format("%06d", score), 60, 55, Color.WHITE);
 
         // Draw level
         gc.setFont(regularFont);
         drawTextWithGlow(gc, "LEVEL", Game.WIDTH / 2 - 40, 25, Color.LIME);
         gc.setFont(titleFont);
-        drawTextWithGlow(gc, String.valueOf(level), Game.WIDTH / 2 - 15, 55, Color.WHITE);
+        drawTextWithGlow(gc, String.valueOf(level), Game.WIDTH / 2 - 40, 55, Color.WHITE);
 
-        // Draw active power-ups on the right
-        int powerUpX = Game.WIDTH - 200;
+        // Draw active power-ups on the right - ADJUSTED margin
+        int powerUpX = Game.WIDTH - 220;
         int powerUpY = 15;
 
         gc.setFont(smallFont);
         gc.setFill(Color.YELLOW);
-        gc.fillText("ACTIVE POWER-UPS:", powerUpX, powerUpY);
+        gc.fillText("ACTIVE POWER-UPS:", powerUpX +60, powerUpY);
 
         powerUpY += 20;
 
@@ -70,7 +70,7 @@ public class HUD {
 
         gc.setFont(smallFont);
         gc.setFill(Color.WHITE);
-        gc.fillText("SPACE: Shoot  |  ← →: Move  |  ESC: Pause", 20, Game.HEIGHT - 10);
+        gc.fillText("SPACE: Shoot  |  ← →: Move  |  ESC: Pause", 150, Game.HEIGHT - 10);
     }
 
     private void drawTextWithGlow(GraphicsContext gc, String text, double x, double y, Color color) {
@@ -94,7 +94,7 @@ public class HUD {
 
         // Draw name
         gc.setFill(Color.WHITE);
-        gc.fillText(name, x + 20, y + 12);
+        gc.fillText(name, x + 75, y + 12);
     }
 
     public void drawMenu(GraphicsContext gc) {
