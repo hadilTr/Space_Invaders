@@ -104,7 +104,6 @@ public class EnemyGroup implements GameComponent {
         return null;
     }
 
-    // Petite méthode utilitaire pour savoir si on a gagné
     public boolean isEmpty() {
         return children.isEmpty();
     }

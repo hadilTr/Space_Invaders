@@ -24,7 +24,6 @@ public class Main extends Application {
         // Création du jeu
         Game game = new Game();
 
-        // IMPORTANT : On branche le clavier sur la scène
         game.getInputHandler().attachToScene(scene);
         SoundManager.getInstance().startMusic("/tn/client/space_invaders/sounds/spaceinvaders1.mp3");
 
@@ -33,7 +32,7 @@ public class Main extends Application {
         primaryStage.setScene(scene);
         primaryStage.setResizable(true);  // Enable maximize button
 
-        // Stretch canvas to fill entire window (may distort aspect ratio)
+        // Stretch canvas to fill entire window
         ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue) -> {
             double scaleX = scene.getWidth() / Game.WIDTH;
             double scaleY = scene.getHeight() / Game.HEIGHT;

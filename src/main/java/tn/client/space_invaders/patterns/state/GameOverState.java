@@ -29,8 +29,7 @@ public class GameOverState implements GameState {
 
     @Override
     public void enter() {
-        // Optionnel : Jouer un son de "Game Over" ici
-        // SoundManager.getInstance().playSFX("gameover");
+
     }
 
     @Override

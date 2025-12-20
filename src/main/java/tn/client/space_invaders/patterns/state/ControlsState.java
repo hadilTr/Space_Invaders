@@ -18,7 +18,6 @@ public class ControlsState implements GameState {
     private GameState previousState;
     private SpaceBackground background;
 
-    // Liste des actions configurables (On exclut PAUSE et SELECT pour éviter de se bloquer)
     private Action[] actions = {Action.UP, Action.DOWN, Action.LEFT, Action.RIGHT, Action.SHOOT};
     private String[] labels = {"HAUT", "BAS", "GAUCHE", "DROITE", "TIRER"};
 
@@ -43,7 +42,6 @@ public class ControlsState implements GameState {
         background.update();
         long now = System.currentTimeMillis();
 
-        // MODE REBINDING : On attend n'importe quelle touche
         if (isRebinding) {
             KeyCode newKey = game.getInputHandler().consumeLastKey();
             if (newKey != null) {
@@ -57,7 +55,6 @@ public class ControlsState implements GameState {
             return; // On ne fait rien d'autre tant qu'on attend la touche
         }
 
-        // MODE NAVIGATION CLASSIQUE
         if (now - lastInputTime < 200) return;
 
         // Retour en arrière (Bouton Options ou Echap)

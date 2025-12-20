@@ -19,7 +19,7 @@ public class MenuState implements GameState {
     private String[] options = {"JOUER", "OPTIONS", "QUITTER"};
     private int currentSelection = 0;
 
-    // Timer pour la navigation (éviter que ça défile trop vite)
+    // Timer pour la navigation
     private long lastInputTime;
 
     public MenuState(Game game) {
@@ -36,8 +36,7 @@ public class MenuState implements GameState {
     @Override
     public void update() {
         background.update();
-        // Le fond doit bouger même dans le menu
-        // (Si SpaceBackground a une méthode update, appelez-la ici)
+
 
         long now = System.currentTimeMillis();
         if (now - lastInputTime < 300) return;

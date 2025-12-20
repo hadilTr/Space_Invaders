@@ -50,12 +50,7 @@ public class WinState implements GameState {
         if (game.getInputHandler().isActionActive(GameConfig.Action.SELECT)) {
             if (currentSelection == 0) {
                 SoundManager.getInstance().playSFX("select");
-                // REJOUER : On relance une PlayingState (qui fera un reset car player sera null)
-                // Attention : Il faudra s'assurer que PlayingState reset bien tout.
-                // Petite astuce : on peut forcer le reset manuellement si besoin,
-                // mais votre PlayingState actuel recrée tout si on passe une nouvelle instance ?
-                // Non, PlayingState est unique ?
-                // Mieux : On crée une NOUVELLE instance de PlayingState pour être sûr.
+
                 game.resetScore();
                 game.changeState(new PlayingState(game));
             } else {

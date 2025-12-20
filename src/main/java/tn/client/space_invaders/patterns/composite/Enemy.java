@@ -17,7 +17,6 @@ public class Enemy extends GameObject {
 
     @Override
     public void draw(GraphicsContext gc) {
-        // Classic Space Invader alien shape
 
         // Body - main rectangular body
         gc.setFill(Color.LIME);

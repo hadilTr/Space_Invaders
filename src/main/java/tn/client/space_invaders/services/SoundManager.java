@@ -16,8 +16,7 @@ public class SoundManager {
     private MediaPlayer backgroundMusic;
 
     private SoundManager() {
-        // --- CHARGEMENT DES SONS ---
-        // Assurez-vous que les fichiers sont dans src/main/resources/sounds/
+
         loadSFX("shoot", "/tn/client/space_invaders/sounds/shoot.wav");
         loadSFX("explosion", "/tn/client/space_invaders/sounds/explosion.wav");
         loadSFX("invaderkilled", "/tn/client/space_invaders/sounds/invaderkilled.wav");

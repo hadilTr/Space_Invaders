@@ -52,7 +52,6 @@ public class OptionsState implements GameState {
             lastInputTime = now;
         }
 
-        // GAUCHE / DROITE (Changer les valeurs)
         if (game.getInputHandler().isActionActive(GameConfig.Action.LEFT)) {
             adjustSetting(-0.1); // -10%
             lastInputTime = now;
@@ -105,7 +104,6 @@ public class OptionsState implements GameState {
             // Affichage du nom de l'option
             gc.fillText(options[i], Game.WIDTH / 2, y);
 
-            // Affichage des Barres de volume (seulement pour 0 et 1)
             if (i == 0 || i == 1) {
                 drawVolumeBar(gc, i == 0 ? GameConfig.getInstance().getMusicVolume() : GameConfig.getInstance().getSfxVolume(), y + 20);
             }
