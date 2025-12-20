@@ -1,10 +1,13 @@
 package tn.client.space_invaders.view;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.TextAlignment; // Important pour centrer le texte dynamique
 import tn.client.space_invaders.core.Game;
+import tn.client.space_invaders.core.GameConfig; // Import de la config
 
 public class HUD {
 
@@ -18,6 +21,22 @@ public class HUD {
         smallFont = Font.font("Arial", FontWeight.NORMAL, 14);
     }
 
+    // --- NOUVELLE MÉTHODE UTILITAIRE ---
+    // Récupère le nom de la touche (ex: "Space", "Enter", "A", "Left")
+    private String getKeyName(GameConfig.Action action) {
+        KeyCode key = GameConfig.getInstance().getKey(action);
+        switch (key) {
+            case LEFT: return "←";
+            case RIGHT: return "→";
+            case UP: return "↑";
+            case DOWN: return "↓";
+            case ENTER: return "ENTER"; // Plus joli que "ENTER" parfois
+            case SPACE: return "SPACE";
+            case ESCAPE: return "ESC";
+            default: return key.getName().toUpperCase();
+        }
+    }
+
     public void drawGameHUD(GraphicsContext gc, int score, int level,
                             boolean hasShield, boolean hasRapidFire,
                             boolean hasTripleShot, boolean hasSpeedBoost) {
@@ -26,19 +45,28 @@ public class HUD {
         gc.setFill(Color.rgb(0, 0, 0, 0.6));
         gc.fillRect(0, 0, Game.WIDTH, 70);
 
-        // Draw score with glow effect - INCREASED margin from 20 to 40
+        // Draw score with glow effect
         gc.setFont(regularFont);
+        gc.setTextAlign(TextAlignment.LEFT); // Reset alignement
         drawTextWithGlow(gc, "SCORE", 50, 25, Color.CYAN);
         gc.setFont(titleFont);
         drawTextWithGlow(gc, String.format("%06d", score), 60, 55, Color.WHITE);
 
-        // Draw level
-        gc.setFont(regularFont);
-        drawTextWithGlow(gc, "LEVEL", Game.WIDTH / 2 - 40, 25, Color.LIME);
-        gc.setFont(titleFont);
-        drawTextWithGlow(gc, String.valueOf(level), Game.WIDTH / 2 - 40, 55, Color.WHITE);
+        gc.setTextAlign(TextAlignment.CENTER);
 
-        // Draw active power-ups on the right - ADJUSTED margin
+        // 2. Le mot "LEVEL" (en haut)
+        gc.setFont(regularFont);
+        drawTextWithGlow(gc, "LEVEL", Game.WIDTH / 2, 25, Color.LIME);
+
+        // 3. Le Numéro (en bas)
+        gc.setFont(titleFont);
+        drawTextWithGlow(gc, String.valueOf(level), Game.WIDTH / 2, 55, Color.WHITE);
+
+        // --- IMPORTANT : RESET ALIGNEMENT ---
+        // On remet l'alignement à GAUCHE pour que les Power-Ups ne soient pas décalés
+        gc.setTextAlign(TextAlignment.LEFT);
+
+        // Draw active power-ups on the right
         int powerUpX = Game.WIDTH - 220;
         int powerUpY = 15;
 
@@ -68,31 +96,38 @@ public class HUD {
         gc.setFill(Color.rgb(0, 0, 0, 0.5));
         gc.fillRect(0, Game.HEIGHT - 30, Game.WIDTH, 30);
 
+        // --- CORRECTION ICI : CONTROLES DYNAMIQUES ---
         gc.setFont(smallFont);
         gc.setFill(Color.WHITE);
-        gc.fillText("SPACE: Shoot  |  ← →: Move  |  ESC: Pause", 150, Game.HEIGHT - 10);
+
+        // On construit la chaine dynamiquement
+        String shootKey = getKeyName(GameConfig.Action.SHOOT);
+        String leftKey = getKeyName(GameConfig.Action.LEFT);
+        String rightKey = getKeyName(GameConfig.Action.RIGHT);
+        String pauseKey = getKeyName(GameConfig.Action.PAUSE);
+
+        String controlsText = String.format("%s: Shoot  |  %s / %s: Move  |  %s: Pause",
+                shootKey, leftKey, rightKey, pauseKey);
+
+        // On centre le texte car sa longueur varie selon les touches choisies
+        gc.setTextAlign(TextAlignment.CENTER);
+        gc.fillText(controlsText, Game.WIDTH / 2, Game.HEIGHT - 10);
+        gc.setTextAlign(TextAlignment.LEFT); // Reset pour le reste
     }
 
     private void drawTextWithGlow(GraphicsContext gc, String text, double x, double y, Color color) {
-        // Draw glow/shadow
         gc.setFill(Color.rgb(0, 0, 0, 0.8));
         gc.fillText(text, x + 2, y + 2);
-
-        // Draw main text
         gc.setFill(color);
         gc.fillText(text, x, y);
     }
 
     private void drawPowerUpIcon(GraphicsContext gc, double x, double y, Color color, String name) {
-        // Draw small circle icon
         gc.setFill(color);
         gc.fillOval(x, y, 15, 15);
-
         gc.setStroke(Color.WHITE);
         gc.setLineWidth(1);
         gc.strokeOval(x, y, 15, 15);
-
-        // Draw name
         gc.setFill(Color.WHITE);
         gc.fillText(name, x + 75, y + 12);
     }
@@ -100,32 +135,44 @@ public class HUD {
     public void drawMenu(GraphicsContext gc) {
         // Title with glow
         gc.setFont(Font.font("Arial", FontWeight.BOLD, 60));
-        drawTextWithGlow(gc, "SPACE INVADERS", Game.WIDTH / 2 - 250, 150, Color.CYAN);
+        // Note: Pour le menu on suppose des positions fixes ou on centre
+        gc.setTextAlign(TextAlignment.CENTER); // Utiliser l'alignement centré simplifie tout
+        drawTextWithGlow(gc, "SPACE INVADERS", Game.WIDTH / 2, 150, Color.CYAN);
 
         // Subtitle
         gc.setFont(regularFont);
         gc.setFill(Color.YELLOW);
-        gc.fillText("~ Defend Earth from Alien Invasion ~", Game.WIDTH / 2 - 180, 200);
+        gc.fillText("~ Defend Earth from Alien Invasion ~", Game.WIDTH / 2, 200);
 
         // Instructions
         gc.setFont(Font.font("Arial", FontWeight.BOLD, 24));
         gc.setFill(Color.WHITE);
-        gc.fillText("Press ENTER to Start", Game.WIDTH / 2 - 120, Game.HEIGHT / 2);
+        String startKey = getKeyName(GameConfig.Action.SELECT); // Touche entrée ou autre
+        gc.fillText("Press " + startKey + " to Start", Game.WIDTH / 2, Game.HEIGHT / 2);
 
-        // Controls
+        // Controls DYNAMIQUES
         gc.setFont(smallFont);
         gc.setFill(Color.LIGHTGRAY);
         int y = Game.HEIGHT / 2 + 80;
-        gc.fillText("CONTROLS:", Game.WIDTH / 2 - 50, y);
-        gc.fillText("← → : Move Ship", Game.WIDTH / 2 - 70, y + 25);
-        gc.fillText("SPACE : Shoot", Game.WIDTH / 2 - 70, y + 45);
-        gc.fillText("ESC : Pause Game", Game.WIDTH / 2 - 70, y + 65);
+
+        gc.fillText("CONTROLS:", Game.WIDTH / 2, y);
+
+        String moveKeys = getKeyName(GameConfig.Action.LEFT) + " / " + getKeyName(GameConfig.Action.RIGHT);
+        gc.fillText(moveKeys + " : Move Ship", Game.WIDTH / 2, y + 25);
+
+        String shootKey = getKeyName(GameConfig.Action.SHOOT);
+        gc.fillText(shootKey + " : Shoot", Game.WIDTH / 2, y + 45);
+
+        String pauseKey = getKeyName(GameConfig.Action.PAUSE);
+        gc.fillText(pauseKey + " : Pause Game", Game.WIDTH / 2, y + 65);
 
         // Power-ups info
         gc.setFill(Color.YELLOW);
         y += 120;
-        gc.fillText("COLLECT POWER-UPS:", Game.WIDTH / 2 - 90, y);
+        gc.fillText("COLLECT POWER-UPS:", Game.WIDTH / 2, y);
 
+        // Pour les icônes, on garde le positionnement manuel ou on ajuste
+        gc.setTextAlign(TextAlignment.LEFT); // Reset pour dessiner les icônes
         drawPowerUpInfo(gc, Game.WIDTH / 2 - 150, y + 20, Color.CYAN, "Shield");
         drawPowerUpInfo(gc, Game.WIDTH / 2 + 30, y + 20, Color.RED, "Rapid Fire");
         drawPowerUpInfo(gc, Game.WIDTH / 2 - 150, y + 50, Color.PURPLE, "Triple Shot");
@@ -137,7 +184,6 @@ public class HUD {
         gc.fillOval(x, y, 12, 12);
         gc.setStroke(Color.WHITE);
         gc.strokeOval(x, y, 12, 12);
-
         gc.setFill(Color.WHITE);
         gc.fillText(name, x + 18, y + 10);
     }
@@ -147,21 +193,32 @@ public class HUD {
         gc.setFill(Color.rgb(0, 0, 0, 0.7));
         gc.fillRect(0, 0, Game.WIDTH, Game.HEIGHT);
 
+        gc.setTextAlign(TextAlignment.CENTER);
+
         // Paused text
         gc.setFont(Font.font("Arial", FontWeight.BOLD, 70));
-        drawTextWithGlow(gc, "PAUSED", Game.WIDTH / 2 - 150, Game.HEIGHT / 2 - 50, Color.YELLOW);
+        drawTextWithGlow(gc, "PAUSED", Game.WIDTH / 2, Game.HEIGHT / 2 - 50, Color.YELLOW);
 
         // Stats
         gc.setFont(regularFont);
         gc.setFill(Color.WHITE);
-        gc.fillText("Score: " + String.format("%06d", score), Game.WIDTH / 2 - 70, Game.HEIGHT / 2 + 20);
-        gc.fillText("Level: " + level, Game.WIDTH / 2 - 40, Game.HEIGHT / 2 + 50);
+        gc.fillText("Score: " + String.format("%06d", score), Game.WIDTH / 2, Game.HEIGHT / 2 + 20);
+        gc.fillText("Level: " + level, Game.WIDTH / 2, Game.HEIGHT / 2 + 50);
 
-        // Instructions
+        // Instructions DYNAMIQUES
+        String pauseKey = getKeyName(GameConfig.Action.PAUSE);
+        String menuKey = getKeyName(GameConfig.Action.SELECT); // Touche pour valider le menu
+
         gc.setFont(smallFont);
         gc.setFill(Color.LIGHTGRAY);
-        gc.fillText("Press ESC to Resume", Game.WIDTH / 2 - 80, Game.HEIGHT / 2 + 100);
-        gc.fillText("Press ENTER to Main Menu", Game.WIDTH / 2 - 100, Game.HEIGHT / 2 + 120);
+        gc.fillText("Press " + pauseKey + " to Resume", Game.WIDTH / 2, Game.HEIGHT / 2 + 100);
+
+        // Note: Ici c'est un peu ambigu car PauseState utilise un menu navigable,
+        // donc "Enter" ne sert pas directement à aller au menu principal, mais à valider le choix.
+        // On peut simplifier :
+        gc.fillText("Use Arrows & " + menuKey + " to Navigate", Game.WIDTH / 2, Game.HEIGHT / 2 + 120);
+
+        gc.setTextAlign(TextAlignment.LEFT);
     }
 
     public void drawGameOver(GraphicsContext gc, int finalScore, int level) {
@@ -169,21 +226,27 @@ public class HUD {
         gc.setFill(Color.rgb(0, 0, 0, 0.8));
         gc.fillRect(0, 0, Game.WIDTH, Game.HEIGHT);
 
+        gc.setTextAlign(TextAlignment.CENTER);
+
         // Game Over text
         gc.setFont(Font.font("Arial", FontWeight.BOLD, 70));
-        drawTextWithGlow(gc, "GAME OVER", Game.WIDTH / 2 - 200, Game.HEIGHT / 2 - 80, Color.RED);
+        drawTextWithGlow(gc, "GAME OVER", Game.WIDTH / 2, Game.HEIGHT / 2 - 80, Color.RED);
 
         // Final stats
         gc.setFont(titleFont);
         gc.setFill(Color.YELLOW);
         gc.fillText("FINAL SCORE: " + String.format("%06d", finalScore),
-                Game.WIDTH / 2 - 160, Game.HEIGHT / 2);
-        gc.fillText("LEVEL REACHED: " + level, Game.WIDTH / 2 - 140, Game.HEIGHT / 2 + 40);
+                Game.WIDTH / 2, Game.HEIGHT / 2);
+        gc.fillText("LEVEL REACHED: " + level, Game.WIDTH / 2, Game.HEIGHT / 2 + 40);
 
-        // Continue
+        // Continue DYNAMIQUE
+        String continueKey = getKeyName(GameConfig.Action.SELECT);
+
         gc.setFont(regularFont);
         gc.setFill(Color.WHITE);
-        gc.fillText("Press ENTER to Continue", Game.WIDTH / 2 - 130, Game.HEIGHT / 2 + 120);
+        gc.fillText("Press " + continueKey + " to Continue", Game.WIDTH / 2, Game.HEIGHT / 2 + 120);
+
+        gc.setTextAlign(TextAlignment.LEFT);
     }
 
     public void drawVictory(GraphicsContext gc, int finalScore) {
@@ -191,27 +254,33 @@ public class HUD {
         gc.setFill(Color.rgb(0, 0, 0, 0.8));
         gc.fillRect(0, 0, Game.WIDTH, Game.HEIGHT);
 
+        gc.setTextAlign(TextAlignment.CENTER);
+
         // Victory text with animation glow
         gc.setFont(Font.font("Arial", FontWeight.BOLD, 70));
         double glowIntensity = 0.5 + Math.sin(System.currentTimeMillis() * 0.005) * 0.5;
         Color glowColor = Color.rgb((int)(255 * glowIntensity), 215, 0);
-        drawTextWithGlow(gc, "VICTORY!", Game.WIDTH / 2 - 150, Game.HEIGHT / 2 - 80, glowColor);
+        drawTextWithGlow(gc, "VICTORY!", Game.WIDTH / 2, Game.HEIGHT / 2 - 80, glowColor);
 
         // Congratulations
         gc.setFont(regularFont);
         gc.setFill(Color.CYAN);
         gc.fillText("You have defeated the alien invasion!",
-                Game.WIDTH / 2 - 180, Game.HEIGHT / 2 - 20);
+                Game.WIDTH / 2, Game.HEIGHT / 2 - 20);
 
         // Final score
         gc.setFont(titleFont);
         gc.setFill(Color.YELLOW);
         gc.fillText("FINAL SCORE: " + String.format("%06d", finalScore),
-                Game.WIDTH / 2 - 160, Game.HEIGHT / 2 + 40);
+                Game.WIDTH / 2, Game.HEIGHT / 2 + 40);
 
-        // Continue
+        // Continue DYNAMIQUE
+        String continueKey = getKeyName(GameConfig.Action.SELECT);
+
         gc.setFont(regularFont);
         gc.setFill(Color.WHITE);
-        gc.fillText("Press ENTER to Main Menu", Game.WIDTH / 2 - 130, Game.HEIGHT / 2 + 120);
+        gc.fillText("Press " + continueKey + " to Main Menu", Game.WIDTH / 2, Game.HEIGHT / 2 + 120);
+
+        gc.setTextAlign(TextAlignment.LEFT);
     }
 }

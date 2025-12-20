@@ -56,6 +56,7 @@ public class WinState implements GameState {
                 // mais votre PlayingState actuel recrée tout si on passe une nouvelle instance ?
                 // Non, PlayingState est unique ?
                 // Mieux : On crée une NOUVELLE instance de PlayingState pour être sûr.
+                game.resetScore();
                 game.changeState(new PlayingState(game));
             } else {
                 SoundManager.getInstance().playSFX("select");
@@ -76,6 +77,8 @@ public class WinState implements GameState {
         gc.setEffect(new javafx.scene.effect.Glow(1.0));
         gc.setFont(Font.font("Verdana", FontWeight.BOLD, 60));
         gc.fillText("VICTOIRE !", Game.WIDTH / 2, 150);
+        gc.setEffect(null);
+
 
         gc.setFill(Color.LIGHTGREEN);
         gc.setFont(Font.font("Arial", FontWeight.BOLD, 25));

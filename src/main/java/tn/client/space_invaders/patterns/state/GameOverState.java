@@ -57,6 +57,7 @@ public class GameOverState implements GameState {
                 // mais votre PlayingState actuel recrée tout si on passe une nouvelle instance ?
                 // Non, PlayingState est unique ?
                 // Mieux : On crée une NOUVELLE instance de PlayingState pour être sûr.
+                game.resetScore();
                 game.changeState(new PlayingState(game));
             } else {
                 SoundManager.getInstance().playSFX("select");
