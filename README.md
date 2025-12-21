@@ -103,7 +103,7 @@ Les contrôles sont gérés par le module `InputHandler` et sont configurables v
 
 2.  **Cloner le dépôt :**
     ```bash
-    git clone [https://github.com/VOTRE_USER/NOM_DU_PROJET.git](https://github.com/VOTRE_USER/NOM_DU_PROJET.git)
+    git clone https://github.com/hadilTr/Space_Invaders.git
     ```
 
 3.  **Compiler et Lancer :**
