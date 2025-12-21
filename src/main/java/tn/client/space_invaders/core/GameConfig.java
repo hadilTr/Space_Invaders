@@ -8,12 +8,9 @@ public class GameConfig {
 
     private static GameConfig instance;
 
-    // Volumes (0.0 à 1.0)
     private double musicVolume = 0.5;
     private double sfxVolume = 0.8;
 
-    // Mapping des touches (Action -> Touche Clavier)
-    // On utilise un Enum pour définir les actions possibles
     public enum Action {
         UP, DOWN, LEFT, RIGHT, SHOOT, PAUSE, SELECT
     }
@@ -39,7 +36,6 @@ public class GameConfig {
         return instance;
     }
 
-    // Getters / Setters
     public double getMusicVolume() { return musicVolume; }
     public void setMusicVolume(double v) {
         this.musicVolume = Math.max(0, Math.min(1, v)); // Borner entre 0 et 1

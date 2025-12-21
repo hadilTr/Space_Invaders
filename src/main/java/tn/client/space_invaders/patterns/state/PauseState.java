@@ -20,7 +20,7 @@ public class PauseState implements GameState {
     public PauseState(Game game, GameState returnState) {
         this.game = game;
         this.returnState = returnState;
-        this.lastInputTime = System.currentTimeMillis(); // Important pour l'anti-rebond initial
+        this.lastInputTime = System.currentTimeMillis();
     }
 
     @Override
@@ -33,13 +33,11 @@ public class PauseState implements GameState {
         long now = System.currentTimeMillis();
         if (now - lastInputTime < 300) return;
 
-        // ECHAP pour revenir direct
         if (game.getInputHandler().isActionActive(GameConfig.Action.PAUSE)) {
             game.changeState(returnState);
             return;
         }
 
-        // Navigation Menu
         if (game.getInputHandler().isActionActive(GameConfig.Action.UP)) {
             currentSelection--;
             if (currentSelection < 0) currentSelection = options.length - 1;
@@ -75,14 +73,11 @@ public class PauseState implements GameState {
 
     @Override
     public void draw(GraphicsContext gc) {
-        // 1. Dessiner le jeu derrière
         returnState.draw(gc);
 
-        // 2. Voile noir
         gc.setFill(Color.rgb(0, 0, 0, 0.7));
         gc.fillRect(0, 0, Game.WIDTH, Game.HEIGHT);
 
-        // 3. Menu
         gc.setTextAlign(TextAlignment.CENTER);
         gc.setFill(Color.WHITE);
         gc.setFont(Font.font("Arial", FontWeight.BOLD, 50));

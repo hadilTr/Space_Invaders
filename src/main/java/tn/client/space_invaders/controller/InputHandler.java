@@ -26,13 +26,10 @@ public class InputHandler {
         scene.setOnKeyReleased(event -> activeKeys.remove(event.getCode()));
     }
 
-    // Ancienne méthode (on la garde pour compatibilité si besoin)
     public boolean isKeyPressed(KeyCode key) {
         return activeKeys.contains(key);
     }
 
-    // NOUVELLE MÉTHODE : Vérifie une ACTION (ex: Action.SHOOT)
-    // peu importe quelle touche y est associée dans la Config
     public boolean isActionActive(GameConfig.Action action) {
         KeyCode boundKey = GameConfig.getInstance().getKey(action);
         return activeKeys.contains(boundKey);

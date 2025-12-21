@@ -29,8 +29,6 @@ public class GameOverState implements GameState {
 
     @Override
     public void enter() {
-        // Optionnel : Jouer un son de "Game Over" ici
-        // SoundManager.getInstance().playSFX("gameover");
     }
 
     @Override
@@ -39,7 +37,6 @@ public class GameOverState implements GameState {
         long now = System.currentTimeMillis();
         if (now - lastInputTime < 300) return;
 
-        // Navigation
         if (game.getInputHandler().isActionActive(GameConfig.Action.UP) ||
                 game.getInputHandler().isActionActive(GameConfig.Action.DOWN)) {
             SoundManager.getInstance().playSFX("select");
@@ -47,21 +44,13 @@ public class GameOverState implements GameState {
             lastInputTime = now;
         }
 
-        // Validation
         if (game.getInputHandler().isActionActive(GameConfig.Action.SELECT)) {
             if (currentSelection == 0) {
                 SoundManager.getInstance().playSFX("select");
-                // REJOUER : On relance une PlayingState (qui fera un reset car player sera null)
-                // Attention : Il faudra s'assurer que PlayingState reset bien tout.
-                // Petite astuce : on peut forcer le reset manuellement si besoin,
-                // mais votre PlayingState actuel recrée tout si on passe une nouvelle instance ?
-                // Non, PlayingState est unique ?
-                // Mieux : On crée une NOUVELLE instance de PlayingState pour être sûr.
                 game.resetScore();
                 game.changeState(new PlayingState(game));
             } else {
                 SoundManager.getInstance().playSFX("select");
-                // MENU
                 game.changeState(new MenuState(game));
             }
         }
@@ -73,19 +62,16 @@ public class GameOverState implements GameState {
 
         gc.setTextAlign(TextAlignment.CENTER);
 
-        // Titre GAME OVER
         gc.setFill(Color.RED);
         gc.setEffect(new javafx.scene.effect.Glow(0.8));
         gc.setFont(Font.font("Verdana", FontWeight.BOLD, 60));
         gc.fillText("GAME OVER", Game.WIDTH / 2, 200);
         gc.setEffect(null);
 
-        // Score
         gc.setFill(Color.WHITE);
         gc.setFont(Font.font("Arial", FontWeight.NORMAL, 30));
         gc.fillText("Score Final : " + finalScore, Game.WIDTH / 2, 280);
 
-        // Menu
         gc.setFont(Font.font("Consolas", FontWeight.BOLD, 30));
         for (int i = 0; i < options.length; i++) {
             if (i == currentSelection) {

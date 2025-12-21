@@ -21,24 +21,19 @@ public class Main extends Application {
 
         Scene scene = new Scene(root, Game.WIDTH, Game.HEIGHT);
 
-        // Création du jeu
         Game game = new Game();
 
-        // IMPORTANT : On branche le clavier sur la scène
         game.getInputHandler().attachToScene(scene);
         SoundManager.getInstance().startMusic("/tn/client/space_invaders/sounds/spaceinvaders1.mp3");
 
-        // Setup stage BEFORE starting game
         primaryStage.setTitle("Space Invaders - JavaFX");
         primaryStage.setScene(scene);
         primaryStage.setResizable(true);  // Enable maximize button
 
-        // Stretch canvas to fill entire window (may distort aspect ratio)
         ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue) -> {
             double scaleX = scene.getWidth() / Game.WIDTH;
             double scaleY = scene.getHeight() / Game.HEIGHT;
 
-            // Use both scales independently to fill the window completely
             canvas.setScaleX(scaleX);
             canvas.setScaleY(scaleY);
         };
@@ -48,10 +43,8 @@ public class Main extends Application {
 
         primaryStage.show();
 
-        // Request focus AFTER showing the stage
         root.requestFocus();
 
-        // Lancement du jeu en dernier
         GraphicsContext gc = canvas.getGraphicsContext2D();
         game.start(gc);
     }

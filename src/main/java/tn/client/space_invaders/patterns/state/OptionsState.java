@@ -13,7 +13,7 @@ import tn.client.space_invaders.view.SpaceBackground;
 public class OptionsState implements GameState {
 
     private Game game;
-    private GameState previousState; // Pour savoir où revenir (Menu ou Pause)
+    private GameState previousState;
     private SpaceBackground background;
 
     private String[] options = {"VOLUME MUSIQUE", "VOLUME EFFETS","CONTROLES", "RETOUR"};
@@ -52,13 +52,12 @@ public class OptionsState implements GameState {
             lastInputTime = now;
         }
 
-        // GAUCHE / DROITE (Changer les valeurs)
         if (game.getInputHandler().isActionActive(GameConfig.Action.LEFT)) {
-            adjustSetting(-0.1); // -10%
+            adjustSetting(-0.1);
             lastInputTime = now;
         }
         if (game.getInputHandler().isActionActive(GameConfig.Action.RIGHT)) {
-            adjustSetting(0.1); // +10%
+            adjustSetting(0.1);
             lastInputTime = now;
         }
 

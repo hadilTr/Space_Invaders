@@ -42,7 +42,7 @@ public class WinState implements GameState {
         if (game.getInputHandler().isActionActive(GameConfig.Action.UP) ||
                 game.getInputHandler().isActionActive(GameConfig.Action.DOWN)) {
             SoundManager.getInstance().playSFX("select");
-            currentSelection = (currentSelection == 0) ? 1 : 0; // Bascule entre 0 et 1
+            currentSelection = (currentSelection == 0) ? 1 : 0;
             lastInputTime = now;
         }
 
@@ -50,12 +50,6 @@ public class WinState implements GameState {
         if (game.getInputHandler().isActionActive(GameConfig.Action.SELECT)) {
             if (currentSelection == 0) {
                 SoundManager.getInstance().playSFX("select");
-                // REJOUER : On relance une PlayingState (qui fera un reset car player sera null)
-                // Attention : Il faudra s'assurer que PlayingState reset bien tout.
-                // Petite astuce : on peut forcer le reset manuellement si besoin,
-                // mais votre PlayingState actuel recrée tout si on passe une nouvelle instance ?
-                // Non, PlayingState est unique ?
-                // Mieux : On crée une NOUVELLE instance de PlayingState pour être sûr.
                 game.resetScore();
                 game.changeState(new PlayingState(game));
             } else {
@@ -72,7 +66,6 @@ public class WinState implements GameState {
 
         gc.setTextAlign(TextAlignment.CENTER);
 
-        // Titre VICTOIRE
         gc.setFill(Color.GOLD); // Couleur Or
         gc.setEffect(new javafx.scene.effect.Glow(1.0));
         gc.setFont(Font.font("Verdana", FontWeight.BOLD, 60));
@@ -84,12 +77,10 @@ public class WinState implements GameState {
         gc.setFont(Font.font("Arial", FontWeight.BOLD, 25));
         gc.fillText("Mission Accomplie Commandant.", Game.WIDTH / 2, 240);
 
-        // Score
         gc.setFill(Color.WHITE);
         gc.setFont(Font.font("Arial", FontWeight.NORMAL, 30));
         gc.fillText("Score Final : " + finalScore, Game.WIDTH / 2, 320);
 
-        // Menu
         gc.setFont(Font.font("Consolas", FontWeight.BOLD, 30));
         for (int i = 0; i < options.length; i++) {
             if (i == currentSelection) {

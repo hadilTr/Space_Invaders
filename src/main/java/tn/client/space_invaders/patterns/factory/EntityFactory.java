@@ -8,7 +8,6 @@ import tn.client.space_invaders.patterns.composite.Enemy;
 
 public class EntityFactory {
 
-    // On ajoute l'argument 'Game game' ici
     public static GameComponent createPlayer(Game game, int x, int y, int w, int h) {
         return new Player(game, x, y, w, h);
     }

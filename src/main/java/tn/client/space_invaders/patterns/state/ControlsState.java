@@ -18,7 +18,6 @@ public class ControlsState implements GameState {
     private GameState previousState;
     private SpaceBackground background;
 
-    // Liste des actions configurables (On exclut PAUSE et SELECT pour éviter de se bloquer)
     private Action[] actions = {Action.UP, Action.DOWN, Action.LEFT, Action.RIGHT, Action.SHOOT};
     private String[] labels = {"HAUT", "BAS", "GAUCHE", "DROITE", "TIRER"};
 
@@ -43,24 +42,20 @@ public class ControlsState implements GameState {
         background.update();
         long now = System.currentTimeMillis();
 
-        // MODE REBINDING : On attend n'importe quelle touche
         if (isRebinding) {
             KeyCode newKey = game.getInputHandler().consumeLastKey();
             if (newKey != null) {
-                // On interdit ECHAP pour éviter les bugs
                 if (newKey != KeyCode.ESCAPE) {
                     GameConfig.getInstance().setKey(actions[currentSelection], newKey);
                 }
                 isRebinding = false;
                 lastInputTime = now;
             }
-            return; // On ne fait rien d'autre tant qu'on attend la touche
+            return;
         }
 
-        // MODE NAVIGATION CLASSIQUE
         if (now - lastInputTime < 200) return;
 
-        // Retour en arrière (Bouton Options ou Echap)
         if (game.getInputHandler().isActionActive(Action.SELECT) && currentSelection == actions.length) {
             game.changeState(previousState);
             return;
@@ -70,7 +65,6 @@ public class ControlsState implements GameState {
             return;
         }
 
-        // Navigation Haut/Bas
         if (game.getInputHandler().isActionActive(Action.UP)) {
             currentSelection--;
             if (currentSelection < 0) currentSelection = actions.length; // +1 pour le bouton Retour
@@ -84,7 +78,6 @@ public class ControlsState implements GameState {
             lastInputTime = now;
         }
 
-        // Sélectionner pour modifier
         if (game.getInputHandler().isActionActive(Action.SELECT)) {
             SoundManager.getInstance().playSFX("select");
             if (currentSelection < actions.length) {
@@ -109,7 +102,6 @@ public class ControlsState implements GameState {
         for (int i = 0; i < actions.length; i++) {
             int y = 180 + i * 60;
 
-            // Si c'est l'élément sélectionné
             if (i == currentSelection) {
                 gc.setFill(isRebinding ? Color.RED : Color.YELLOW); // ROUGE si on attend une touche
                 if (isRebinding) {
@@ -125,7 +117,6 @@ public class ControlsState implements GameState {
             }
         }
 
-        // Bouton RETOUR (situé après la liste)
         int yRetour = 180 + actions.length * 60 + 20;
         if (currentSelection == actions.length) {
             gc.setFill(Color.YELLOW);
@@ -135,7 +126,6 @@ public class ControlsState implements GameState {
             gc.fillText("RETOUR", Game.WIDTH / 2, yRetour);
         }
 
-        // Aide
         gc.setFont(Font.font("Arial", 15));
         gc.setFill(Color.CYAN);
         if (isRebinding) {

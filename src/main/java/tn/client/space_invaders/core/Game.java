@@ -6,6 +6,7 @@ import tn.client.space_invaders.controller.InputHandler;
 import tn.client.space_invaders.model.Level;
 import tn.client.space_invaders.patterns.state.GameState;
 import tn.client.space_invaders.patterns.state.MenuState;
+import tn.client.space_invaders.services.GameLogger;
 import tn.client.space_invaders.view.SpaceBackground;
 
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ public class Game {
     }
 
     public void start(GraphicsContext gc) {
-
+        GameLogger.getInstance().info("Initialisation du moteur de jeu...");
         if (isRunning) {
             return;
         }
@@ -50,6 +51,7 @@ public class Game {
     }
 
     public void stop() {
+        GameLogger.getInstance().info("Arrêt du jeu.");
         if (isRunning && gameLoop != null) {
             gameLoop.stop();
             isRunning = false;
@@ -68,10 +70,8 @@ public class Game {
     private void render(GraphicsContext gc) {
         gc.setEffect(null);
         gc.setGlobalAlpha(1.0);
-        // Draw animated space background instead of black
         spaceBackground.draw(gc);
 
-        // Draw current game state on top
         if (currentState != null) {
             currentState.draw(gc);
         }

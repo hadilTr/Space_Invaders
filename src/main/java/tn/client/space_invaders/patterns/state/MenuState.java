@@ -15,11 +15,9 @@ public class MenuState implements GameState {
     private Game game;
     private SpaceBackground background;
 
-    // Options du menu
     private String[] options = {"JOUER", "OPTIONS", "QUITTER"};
     private int currentSelection = 0;
 
-    // Timer pour la navigation (éviter que ça défile trop vite)
     private long lastInputTime;
 
     public MenuState(Game game) {
@@ -36,13 +34,11 @@ public class MenuState implements GameState {
     @Override
     public void update() {
         background.update();
-        // Le fond doit bouger même dans le menu
-        // (Si SpaceBackground a une méthode update, appelez-la ici)
+
 
         long now = System.currentTimeMillis();
         if (now - lastInputTime < 300) return;
 
-        // Navigation HAUT
         if (game.getInputHandler().isActionActive(GameConfig.Action.UP)) {
             currentSelection--;
             if (currentSelection < 0) currentSelection = options.length - 1;
@@ -50,7 +46,6 @@ public class MenuState implements GameState {
             lastInputTime = now;
         }
 
-        // Navigation BAS
         if (game.getInputHandler().isActionActive(GameConfig.Action.DOWN)) {
             currentSelection++;
             if (currentSelection >= options.length) currentSelection = 0;
@@ -58,7 +53,6 @@ public class MenuState implements GameState {
             lastInputTime = now;
         }
 
-        // Validation (ENTRÉE)
         if (game.getInputHandler().isActionActive(GameConfig.Action.SELECT)) {
             lastInputTime = now; // Anti-rebond
             SoundManager.getInstance().playSFX("select");
@@ -82,10 +76,8 @@ public class MenuState implements GameState {
 
     @Override
     public void draw(GraphicsContext gc) {
-        // 1. Dessiner le fond étoilé
         background.draw(gc);
 
-        // 2. Titre
         gc.setTextAlign(TextAlignment.CENTER);
         gc.setFill(Color.CYAN);
         gc.setEffect(new javafx.scene.effect.Glow(0.8)); // Petit effet néon
@@ -93,22 +85,18 @@ public class MenuState implements GameState {
         gc.fillText("SPACE INVADERS", Game.WIDTH / 2, 150);
         gc.setEffect(null); // On retire l'effet pour la suite
 
-        // 3. Dessiner les options
         gc.setFont(Font.font("Consolas", FontWeight.BOLD, 30));
 
         for (int i = 0; i < options.length; i++) {
             if (i == currentSelection) {
-                // Option sélectionnée : JAUNE + Curseur ">"
                 gc.setFill(Color.YELLOW);
                 gc.fillText("> " + options[i] + " <", Game.WIDTH / 2, 300 + i * 50);
             } else {
-                // Option normale : BLANC GRISÉ
                 gc.setFill(Color.LIGHTGRAY);
                 gc.fillText(options[i], Game.WIDTH / 2, 300 + i * 50);
             }
         }
 
-        // Crédits bas de page
         gc.setFont(Font.font("Arial", 12));
         gc.setFill(Color.GRAY);
         gc.fillText("Projet Design Patterns 2025", Game.WIDTH / 2, Game.HEIGHT - 30);

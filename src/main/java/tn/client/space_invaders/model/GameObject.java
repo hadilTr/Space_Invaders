@@ -15,7 +15,7 @@ public abstract class GameObject implements GameComponent {
     }
 
     public abstract void update();
-    public abstract void draw(GraphicsContext gc); // <--- Mise à jour ici aussi
+    public abstract void draw(GraphicsContext gc);
 
     @Override
     public int getX() { return x; }

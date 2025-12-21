@@ -16,14 +16,9 @@ public class SoundManager {
     private MediaPlayer backgroundMusic;
 
     private SoundManager() {
-        // --- CHARGEMENT DES SONS ---
-        // Assurez-vous que les fichiers sont dans src/main/resources/sounds/
         loadSFX("shoot", "/tn/client/space_invaders/sounds/shoot.wav");
         loadSFX("explosion", "/tn/client/space_invaders/sounds/explosion.wav");
         loadSFX("invaderkilled", "/tn/client/space_invaders/sounds/invaderkilled.wav");
-
-        // Pour le menu, idéalement trouvez un 'select.wav'.
-        // Sinon, on utilise invaderkilled temporairement si le fichier n'existe pas.
         loadSFX("select", "/tn/client/space_invaders/sounds/select.wav");
     }
 
@@ -48,29 +43,26 @@ public class SoundManager {
         }
     }
 
-    // Joue un effet sonore (court)
     public void playSFX(String name) {
         AudioClip clip = soundEffects.get(name);
         if (clip != null) {
-            // On récupère le volume depuis les options (0.0 à 1.0)
             clip.setVolume(GameConfig.getInstance().getSfxVolume());
             clip.play();
         }
     }
 
-    // Lance la musique de fond (longue)
     public void startMusic(String path) {
         try {
             if (backgroundMusic != null) {
-                backgroundMusic.stop(); // Arrête l'ancienne musique si besoin
+                backgroundMusic.stop();
             }
 
             URL resource = getClass().getResource(path);
             if (resource != null) {
                 Media media = new Media(resource.toExternalForm());
                 backgroundMusic = new MediaPlayer(media);
-                backgroundMusic.setCycleCount(MediaPlayer.INDEFINITE); // Boucle infinie
-                updateMusicVolume(); // Applique le volume des options
+                backgroundMusic.setCycleCount(MediaPlayer.INDEFINITE);
+                updateMusicVolume();
                 backgroundMusic.play();
             } else {
                 System.err.println("ERREUR MUSIQUE : Fichier introuvable -> " + path);

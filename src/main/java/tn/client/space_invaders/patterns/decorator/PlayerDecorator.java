@@ -1,15 +1,44 @@
 package tn.client.space_invaders.patterns.decorator;
 
-import tn.client.space_invaders.model.GameComponent;
 import javafx.scene.canvas.GraphicsContext;
+import tn.client.space_invaders.model.Projectile;
+import tn.client.space_invaders.services.GameLogger;
 
-public abstract class PlayerDecorator implements GameComponent {
+import java.util.List;
 
-    protected GameComponent decoratedPlayer;
+public abstract class PlayerDecorator extends Player {
 
-    public PlayerDecorator(GameComponent decoratedPlayer) {
+    protected Player decoratedPlayer;
+    protected long startTime;
+    protected long duration = 8000;
+
+    public PlayerDecorator(Player decoratedPlayer) {
         this.decoratedPlayer = decoratedPlayer;
+        this.game = decoratedPlayer.game;
+        this.startTime = System.currentTimeMillis();
+
+        this.x = decoratedPlayer.getX();
+        this.y = decoratedPlayer.getY();
+        this.width = decoratedPlayer.getWidth();
+        this.height = decoratedPlayer.getHeight();
     }
+
+    @Override
+    public void setX(int x) {
+        super.setX(x);
+        decoratedPlayer.setX(x);
+    }
+
+    @Override
+    public void setY(int y) {
+        super.setY(y);
+        decoratedPlayer.setY(y);
+    }
+
+    @Override
+    public int getX() { return decoratedPlayer.getX(); }
+    @Override
+    public int getY() { return decoratedPlayer.getY(); }
 
     @Override
     public void update() {
@@ -17,27 +46,35 @@ public abstract class PlayerDecorator implements GameComponent {
     }
 
     @Override
-    public void draw(GraphicsContext g) {
-        decoratedPlayer.draw(g);
+    public Player processExpiration() {
+        if (System.currentTimeMillis() - startTime > duration) {
+            return decoratedPlayer.processExpiration();
+        }
+        decoratedPlayer = decoratedPlayer.processExpiration();
+        return this;
     }
 
     @Override
-    public int getX() {
-        return decoratedPlayer.getX();
+    public void refreshPowerUp(Class<?> type) {
+        if (type.isInstance(this)) {
+            this.startTime = System.currentTimeMillis();
+            GameLogger.getInstance().info("Timer réinitialisé pour : " + type.getSimpleName());
+        } else {
+            decoratedPlayer.refreshPowerUp(type);
+        }
     }
 
     @Override
-    public int getY() {
-        return decoratedPlayer.getY();
+    public void draw(GraphicsContext gc) { decoratedPlayer.draw(gc); }
+    @Override
+    public boolean takeHit() { return decoratedPlayer.takeHit(); }
+    @Override
+    public boolean hasPowerUp(Class<?> type) {
+        return type.isInstance(this) || decoratedPlayer.hasPowerUp(type);
     }
 
     @Override
-    public int getWidth() {
-        return decoratedPlayer.getWidth();
-    }
-
+    public List<Projectile> shoot() { return decoratedPlayer.shoot(); }
     @Override
-    public int getHeight() {
-        return decoratedPlayer.getHeight();
-    }
+    public List<Projectile> createProjectiles() { return decoratedPlayer.createProjectiles(); }
 }
